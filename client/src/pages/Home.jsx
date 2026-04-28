@@ -13,7 +13,7 @@ export default function Home() {
   const [language, setLanguage] = useState("javascript");
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("issues");
-
+  const decorationRef = useRef([]);
   const editorRef = useRef(null);
 
   useEffect(() => {
@@ -53,23 +53,20 @@ export default function Home() {
     editor.revealLineInCenter(lineNumber);
     editor.setPosition({ lineNumber, column: 1 });
 
-    editor.deltaDecorations(
-      [],
-      [
-        {
-          range: {
-            startLineNumber: lineNumber,
-            endLineNumber: lineNumber,
-            startColumn: 1,
-            endColumn: 1,
-          },
-          options: {
-            isWholeLine: true,
-            className: "bg-yellow-500/20",
-          },
+    decorationRef.current = editor.deltaDecorations(decorationRef.current, [
+      {
+        range: {
+          startLineNumber: lineNumber,
+          endLineNumber: lineNumber,
+          startColumn: 1,
+          endColumn: 1,
         },
-      ],
-    );
+        options: {
+          isWholeLine: true,
+          className: "highlightLine_editor",
+        },
+      },
+    ]);
   };
 
   return (

@@ -1,5 +1,5 @@
 @import "tailwindcss";
 
-.bg-yellow-500\/20 {
-  background: #ecec0667;
+.highlightLine_editor {
+  background: rgba(6, 225, 83, 0.289);
 }
