@@ -7,6 +7,9 @@ import { useRef } from "react";
 
 
 export default function Home() {
+
+  // states 
+
   const [code, setCode] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -79,7 +82,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#0d1117] text-gray-200">
       {/* Header */}
       <div className="border-b border-gray-800 px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">AI Code Reviewer</h1>
+        <h1 className="text-xl font-semibold">CODE INSIGHT</h1>
 
         <select
           value={language}
@@ -126,7 +129,7 @@ export default function Home() {
         </div>
 
         {/* RIGHT: Output */}
-       
+
         <div className="overflow-y-auto h-full">
           {!result ? (
             <div className="text-gray-500 mt-10 text-center">
