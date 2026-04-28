@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
-.highlightLine_editor {
+/* .highlightLine_editor {
   background: rgba(150, 212, 80, 0.289);
+} */
+
+.line-highlight {
+  background: rgba(234, 179, 8, 0.12);
+  border-left: 3px solid rgba(234, 179, 8, 0.85);
 }
+
+/* Optional: slightly better readability for Monaco context */
+.monaco-editor .line-highlight {
+  box-sizing: border-box;
+}
+

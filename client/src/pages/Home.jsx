@@ -15,6 +15,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("issues");
   const decorationRef = useRef([]);
   const editorRef = useRef(null);
+  const highlightTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (result) setActiveTab("issues");
@@ -46,13 +47,20 @@ export default function Home() {
     setTimeout(() => setCopied(false), 1500);
   };
 
+
   const highlightLine = (lineNumber) => {
     const editor = editorRef.current;
     if (!editor) return;
 
+    // clear previous timeout (VERY IMPORTANT)
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+
     editor.revealLineInCenter(lineNumber);
     editor.setPosition({ lineNumber, column: 1 });
 
+    // apply new highlight
     decorationRef.current = editor.deltaDecorations(decorationRef.current, [
       {
         range: {
@@ -63,10 +71,22 @@ export default function Home() {
         },
         options: {
           isWholeLine: true,
-          className: "highlightLine_editor",
+          className: "line-highlight",
         },
       },
     ]);
+
+    // schedule removal (ONLY ONE ACTIVE TIMER)
+    highlightTimeoutRef.current = setTimeout(() => {
+      if (!editorRef.current) return;
+
+      decorationRef.current = editorRef.current.deltaDecorations(
+        decorationRef.current,
+        [],
+      );
+
+      highlightTimeoutRef.current = null;
+    }, 2500);
   };
 
   return (
