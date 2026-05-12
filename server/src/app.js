@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import reviewRoutes from "./routes/reviewRoutes.js";
-
+import authRoutes from './routes/authRouter.js';
 const app = express();
 
 // middlewares
@@ -15,5 +15,6 @@ app.get("/", (req, res) => {
 
 // routes
 app.use("/api/review", reviewRoutes);
+app.use("/api/auth", authRoutes);
 
 export default app;

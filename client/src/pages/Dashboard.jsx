@@ -1,25 +1,28 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { reviewCode } from "../services/api";
 import Editor from "@monaco-editor/react";
 import { DiffEditor } from "@monaco-editor/react";
 import toast from "react-hot-toast";
-import ScoreMeter from "../components/ScoreMeter";
 import ScoreBar from "../components/ScoreBar";
+import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../hooks/useTheme";
+import ThemeToggle from "../components/ThemeToggle";
 
-export default function Home() {
+export default function Dashboard() {
+  const { user, logout, resendVerification, updateUser } = useAuth();
+  const { theme } = useTheme();
   const [code, setCode] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [language, setLanguage] = useState("javascript");
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState("issues");
+  const [resendingVerification, setResendingVerification] = useState(false);
+  const [verificationLink, setVerificationLink] = useState("");
   const decorationRef = useRef([]);
   const editorRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    if (result) setActiveTab("issues");
-  }, [result]);
+  const editorTheme = theme === "dark" ? "vs-dark" : "light";
 
   const handleReview = async () => {
     try {
@@ -28,6 +31,10 @@ export default function Home() {
 
       if (res.success) {
         setResult(res.data);
+        if (res.usage) {
+          updateUser({ usage: res.usage });
+        }
+        setActiveTab("issues");
       } else {
         toast.error(res.error || "Something went wrong");
       }
@@ -47,6 +54,24 @@ export default function Home() {
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const handleResendVerification = async () => {
+    try {
+      setResendingVerification(true);
+      const response = await resendVerification();
+
+      if (response.devVerificationUrl) {
+        setVerificationLink(response.devVerificationUrl);
+      }
+
+      toast.success(response.message || "Verification email sent");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Unable to resend verification email",
+      );
+    } finally {
+      setResendingVerification(false);
+    }
+  };
 
   const highlightLine = (lineNumber) => {
     const editor = editorRef.current;
@@ -90,24 +115,35 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-[#0d1117] to-[#0b0f14] text-gray-200">
+    <div className="app-gradient flex h-screen flex-col">
       {/* HEADER */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-[#0d1117]/80 backdrop-blur">
+      <div className="surface flex items-center justify-between border-b border-subtle px-6 py-4 backdrop-blur">
         {/* LEFT */}
         <div>
-          <h1 className="text-lg font-semibold">CodeInsight AI</h1>
-          <p className="text-xs text-gray-500">
+          <h1 className="text-primary text-lg font-semibold">CodeInsight AI</h1>
+          <p className="text-muted text-xs">
             AI-powered code review & refactoring
           </p>
         </div>
 
         {/* RIGHT */}
         <div className="flex items-center gap-3">
+          <span className="text-muted hidden text-xs sm:inline">
+            {user?.name || user?.email}
+          </span>
+
+          {user?.usage && (
+            <span className="text-muted hidden text-xs md:inline">
+              {user.usage.dailyReviewCount}/{user.usage.dailyReviewLimit} today
+            </span>
+          )}
+
           {/* GitHub link */}
           <a
             href="https://github.com/BhaweshPandey-03/CodeInsight"
             target="_blank"
-            className="text-xs text-gray-400 hover:text-white transition"
+            rel="noreferrer"
+            className="text-secondary text-xs transition hover:text-primary"
           >
             GitHub
           </a>
@@ -116,27 +152,70 @@ export default function Home() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="bg-[#161b22] border border-gray-700 rounded px-3 py-1 text-sm"
+            className="input-field rounded border px-3 py-1 text-sm"
           >
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
           </select>
+
+          <ThemeToggle />
+
+          <button
+            type="button"
+            onClick={logout}
+            className="rounded border border-subtle px-3 py-1 text-xs text-secondary transition hover:border-strong hover:text-primary"
+          >
+            Logout
+          </button>
         </div>
       </div>
+
+      {/* {!user?.isEmailVerified && (
+        <div className="surface-muted border-b border-yellow-500/30 px-6 py-3">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-primary">
+                Verify your email to unlock AI reviews.
+              </p>
+              <p className="text-xs text-muted">
+                We sent a verification link to {user?.email}. Reviews and usage
+                limits activate after verification.
+              </p>
+              {verificationLink && (
+                <a
+                  href={verificationLink}
+                  className="mt-2 inline-block text-xs font-medium text-blue-400"
+                >
+                  Open local verification link
+                </a>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={resendingVerification}
+              className="rounded bg-active px-3 py-2 text-xs font-semibold text-on-active transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resendingVerification ? "Sending..." : "Resend email"}
+            </button>
+          </div>
+        </div>
+      )} */}
 
       {/* MAIN LAYOUT */}
       <div className="flex flex-1 overflow-hidden">
         {/* LEFT PANEL */}
-        <div className="w-1/2 border-r border-gray-800 flex flex-col p-4 gap-3">
+        <div className="flex w-1/2 flex-col gap-3 border-r border-subtle p-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm text-gray-400">Editor</h2>
+            <h2 className="text-secondary text-sm">Editor</h2>
           </div>
 
-          <div className="flex-1 border border-gray-800 rounded-xl overflow-hidden">
+          <div className="flex-1 overflow-hidden rounded-xl border border-subtle">
             <Editor
               height="100%"
-              theme="vs-dark"
+              theme={editorTheme}
               language={language}
               value={code}
               onChange={(value) => setCode(value || "")}
@@ -153,16 +232,22 @@ export default function Home() {
           <button
             onClick={handleReview}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 transition-all duration-200 py-2 rounded-lg font-medium disabled:opacity-50"
+            // disabled={loading || !user?.isEmailVerified}
+            className="rounded-lg bg-blue-600 py-2 font-medium transition-all duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Analyzing..." : "Review Code"}
+            {loading
+              ? "Analyzing..."
+              : //: user?.isEmailVerified
+                //? "Review Code"
+                // : "Verify email to review"}
+                "Review Code"}
           </button>
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-1/2 flex flex-col p-4 overflow-hidden">
+        <div className="flex w-1/2 flex-col overflow-hidden p-4">
           {!result ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
+            <div className="text-muted flex h-full items-center justify-center">
               Run a review to see AI insights
             </div>
           ) : (
@@ -176,15 +261,15 @@ export default function Home() {
               </div>
 
               {/* TABS */}
-              <div className="flex gap-2 mb-3 border-b border-gray-800 pb-2">
+              <div className="mb-3 flex gap-2 border-b border-subtle pb-2">
                 {["issues", "diff", "code"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`px-3 py-1 text-xs rounded-md transition ${
                       activeTab === tab
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-400 hover:text-white hover:bg-[#1a1f2a]"
+                        ? "bg-active text-on-active"
+                        : "text-secondary hover:bg-control hover:text-primary"
                     }`}
                   >
                     {tab.toUpperCase()}
@@ -201,22 +286,22 @@ export default function Home() {
                       <div
                         key={i}
                         onClick={() => highlightLine(issue.line)}
-                        className="p-3 rounded-lg border border-gray-800 bg-[#0f141b] hover:border-blue-500 cursor-pointer transition"
+                        className="surface-muted cursor-pointer rounded-lg border border-subtle p-3 transition hover:border-blue-500"
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-xs font-semibold text-red-400">
                             {issue.type.toUpperCase()}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-muted text-xs">
                             Line {issue.line}
                           </span>
                         </div>
 
-                        <p className="text-sm text-gray-200">
+                        <p className="text-primary text-sm">
                           {issue.description}
                         </p>
 
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-secondary mt-1 text-xs">
                           💡 {issue.suggestion}
                         </p>
                       </div>
@@ -226,13 +311,13 @@ export default function Home() {
 
                 {/* DIFF */}
                 {activeTab === "diff" && (
-                  <div className="h-[500px] border border-gray-800 rounded-xl overflow-hidden">
+                  <div className="h-[500px] overflow-hidden rounded-xl border border-subtle">
                     <DiffEditor
                       height="100%"
                       original={code || ""}
                       modified={result.refactoredCode || ""}
                       language={language}
-                      theme="vs-dark"
+                      theme={editorTheme}
                       options={{
                         readOnly: true,
                         renderSideBySide: true,
@@ -245,21 +330,23 @@ export default function Home() {
                 {activeTab === "code" && (
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <h2 className="text-sm text-gray-400">Refactored Code</h2>
+                      <h2 className="text-secondary text-sm">
+                        Refactored Code
+                      </h2>
 
                       <button
                         onClick={handleCopy}
                         className={`text-xs px-3 py-1 rounded-md transition ${
                           copied
                             ? "bg-green-600"
-                            : "bg-gray-800 hover:bg-gray-700"
+                            : "bg-control text-secondary hover:text-primary"
                         }`}
                       >
                         {copied ? "Copied" : "Copy"}
                       </button>
                     </div>
 
-                    <pre className="bg-[#0f141b] border border-gray-800 p-4 rounded-lg text-sm overflow-auto">
+                    <pre className="surface-muted overflow-auto rounded-lg border border-subtle p-4 text-sm">
                       {result.refactoredCode}
                     </pre>
                   </div>

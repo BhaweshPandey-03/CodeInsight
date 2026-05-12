@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
 
+const MotionCircle = motion.circle;
+
 export default function ScoreMeter({ score = 0 }) {
   const radius = 50;
   const stroke = 8;
@@ -37,7 +39,7 @@ export default function ScoreMeter({ score = 0 }) {
           />
 
           {/* Progress circle */}
-          <motion.circle
+          <MotionCircle
             stroke={getColor()}
             fill="transparent"
             strokeWidth={stroke}

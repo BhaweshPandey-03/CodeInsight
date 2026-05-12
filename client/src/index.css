@@ -1,5 +1,124 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: light;
+  --app-bg: #f6f8fb;
+  --app-bg-soft: #eef3f8;
+  --surface: #ffffff;
+  --surface-muted: #f8fafc;
+  --control: #ffffff;
+  --border: #d8e0ea;
+  --border-strong: #b9c4d0;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --active: #2563eb;
+  --on-active: #ffffff;
+  --shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  --hero-overlay: rgba(246, 248, 251, 0.82);
+  --hero-accent: rgba(37, 99, 235, 0.18);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --app-bg: #080b10;
+  --app-bg-soft: #0b0f14;
+  --surface: #0d1117;
+  --surface-muted: #0f141b;
+  --control: #161b22;
+  --border: #1f2937;
+  --border-strong: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #6b7280;
+  --active: #2563eb;
+  --on-active: #ffffff;
+  --shadow: 0 18px 45px rgba(0, 0, 0, 0.3);
+  --hero-overlay: rgba(8, 11, 16, 0.8);
+  --hero-accent: rgba(37, 99, 235, 0.28);
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-primary);
+}
+
+.app-bg {
+  background: var(--app-bg);
+  color: var(--text-primary);
+}
+
+.app-gradient {
+  background: linear-gradient(to bottom, var(--surface), var(--app-bg-soft));
+  color: var(--text-primary);
+}
+
+.surface {
+  background: var(--surface);
+}
+
+.surface-muted {
+  background: var(--surface-muted);
+}
+
+.bg-control {
+  background: var(--control);
+}
+
+.bg-active {
+  background: var(--active);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-on-active {
+  color: var(--on-active);
+}
+
+.border-subtle {
+  border-color: var(--border);
+}
+
+.border-strong {
+  border-color: var(--border-strong);
+}
+
+.shadow-app {
+  box-shadow: var(--shadow);
+}
+
+.input-field {
+  background: var(--control);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+
+.input-field:focus {
+  border-color: var(--active);
+}
+
+.hero-overlay {
+  background: var(--hero-overlay);
+}
+
+.hero-accent {
+  background: radial-gradient(circle at 70% 20%, var(--hero-accent), transparent 35%);
+}
+
 /* .highlightLine_editor {
   background: rgba(150, 212, 80, 0.289);
 } */

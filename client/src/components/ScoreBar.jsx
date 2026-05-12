@@ -23,11 +23,11 @@ export default function ScoreBar({ score = 0 }) {
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        className="w-full bg-[#0f141b] border border-gray-800 rounded-lg p-3 cursor-pointer"
+        className="surface-muted w-full cursor-pointer rounded-lg border border-subtle p-3"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-gray-400">AI Code Score</span>
+          <span className="text-muted text-xs">AI Code Score</span>
 
           <span
             className={`text-xs font-semibold ${
@@ -45,7 +45,7 @@ export default function ScoreBar({ score = 0 }) {
         </div>
 
         {/* BAR */}
-        <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div className="surface h-2 w-full overflow-hidden rounded-full">
           <div
             className={`h-full transition-all duration-700 ${getColor()}`}
             style={{ width: `${score * 10}%` }}
@@ -55,8 +55,8 @@ export default function ScoreBar({ score = 0 }) {
 
       {/* TOOLTIP */}
       {hover && (
-        <div className="absolute top-full mt-2 left-0 w-full bg-[#161b22] border border-gray-700 rounded-lg p-3 text-xs text-gray-300 shadow-lg z-50">
-          <p className="font-semibold mb-2 text-white">
+        <div className="surface shadow-app absolute left-0 top-full z-50 mt-2 w-full rounded-lg border border-subtle p-3 text-xs text-secondary">
+          <p className="text-primary mb-2 font-semibold">
             What does this score mean?
           </p>
 
