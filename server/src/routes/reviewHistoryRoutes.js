@@ -8,18 +8,18 @@ import {
 
 import {
   protect,
-  enforceDailyReviewLimit,
+
 } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // SAVE REVIEW
-router.post("/", protect, enforceDailyReviewLimit, saveReview);
+router.post("/", protect, saveReview);
 
 // GET USER HISTORY
-router.get("/", protect, enforceDailyReviewLimit, getMyReviews);
+router.get("/", protect, getMyReviews);
 
 // DELETE REVIEW
-router.delete("/:id", protect, enforceDailyReviewLimit, deleteReview);
+router.delete("/:id", protect, deleteReview);
 
 export default router;
