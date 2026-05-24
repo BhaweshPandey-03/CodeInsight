@@ -92,18 +92,26 @@ export const register = async (req, res) => {
       email: normalizedEmail,
       password: hashedPassword,
     });
-    const rawVerificationToken = attachEmailVerificationToken(user);
+    // const rawVerificationToken = attachEmailVerificationToken(user);
+    // await user.save();
+    // const verification = await sendAndShapeVerificationResponse(
+    //   user,
+    //   rawVerificationToken,
+    // );
+
+    // res.status(201).json({
+    //   message: "User registered successfully. Please verify your email.",
+    //   token: generateToken(user),
+    //   user: buildUserResponse(user),
+    //   ...verification,
+    // });
+    user.isEmailVerified = true;
     await user.save();
-    const verification = await sendAndShapeVerificationResponse(
-      user,
-      rawVerificationToken,
-    );
 
     res.status(201).json({
-      message: "User registered successfully. Please verify your email.",
+      message: "User registered successfully",
       token: generateToken(user),
       user: buildUserResponse(user),
-      ...verification,
     });
     console.log("User created: ", user.name, user.email);
   } catch (error) {
