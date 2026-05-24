@@ -39,33 +39,3 @@ export const reviewController = async (req, res) => {
     });
   }
 };
- 
-
-
-export const saveReview = async (req, res) => {
-  const review = await Review.create({
-    user: req.user.id,
-    ...req.body
-  });
-
-  res.json(review);
-};
-
-export const getMyReviews = async (req, res) => {
-  const reviews = await Review.find({ user: req.user.id });
-  res.json(reviews);
-};
-
-export const deleteReview = async (req, res) => {
-  const review = await Review.findById(req.params.id);
-
-  if (!review) return res.status(404).json({ message: "Not found" });
-
-  if (review.user.toString() !== req.user.id && req.user.role !== "admin") {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  await review.deleteOne();
-
-  res.json({ message: "Deleted" });
-};

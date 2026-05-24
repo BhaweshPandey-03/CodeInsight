@@ -1,17 +1,45 @@
-// models/Review.js
 import mongoose from "mongoose";
+
+const issueSchema = new mongoose.Schema({
+  type: String,
+  line: Number,
+  description: String,
+  suggestion: String,
+});
 
 const reviewSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
-    language: String,
-    code: String,
-    result: Object, 
+
+    language: {
+      type: String,
+      required: true,
+    },
+
+    code: {
+      type: String,
+      required: true,
+    },
+
+    result: {
+      summary: String,
+
+      score: Number,
+
+      issues: [issueSchema],
+
+      refactoredCode: String,
+    },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
-export default mongoose.model("Review", reviewSchema);
+const Review = mongoose.model("Review", reviewSchema);
+
+export default Review;
