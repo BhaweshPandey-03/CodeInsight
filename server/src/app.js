@@ -18,5 +18,6 @@ app.get("/", (req, res) => {
 app.use("/api/review", reviewRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/auth", authRoutes);
+console.log("OK!");
 
 export default app;
